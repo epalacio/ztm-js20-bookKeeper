@@ -6,6 +6,8 @@ const websiteNameEl = document.getElementById('website-name')
 const websiteUrlEl = document.getElementById('website-url')
 const bookmarksContainer = document.getElementById('bookmarks-container')
 
+let bookmarks = []
+
 // Show modal, focus on Input
 const showModal = () => {
     modal.classList.add('show-modal')
@@ -33,6 +35,24 @@ const validate = (nameValue, urlValue) => {
     return true
 }
 
+// Fetch Bookmarks from localStorage
+const fetchBookmarks = () => {
+    // Get bookmarks from localStorage if available
+    if (localStorage.getItem('bookmarks')) {
+        bookmarks = JSON.parse(localStorage.getItem('bookmarks'))
+    } else {
+        // Create bookmarks array in localStorage
+        bookmarks = [
+            {
+                name: 'Tester Site',
+                url: 'https://www.google.com'
+            }
+        ]
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks))
+    }
+}
+
+
 // Handle Data from Form
 const storeBookmark = (e) => {
     e.preventDefault()
@@ -41,11 +61,22 @@ const storeBookmark = (e) => {
     if (!urlValue.includes('http://', 'https://')) {
         urlValue = `https://${urlValue}`
     }
-    console.log(nameValue, urlValue);
     if (!validate(nameValue, urlValue)) {
        return false 
     }
+    const bookmark = {
+        name: nameValue,
+        url: urlValue,
+    }
+    bookmarks.push(bookmark)
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks))
+    fetchBookmarks()
+    bookmarkForm.reset()
+    websiteNameEl.focus()
 }
 
 // Event Listener
 bookmarkForm.addEventListener('submit', storeBookmark)
+
+// On load, fetch bookmarks
+fetchBookmarks()

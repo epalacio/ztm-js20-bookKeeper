@@ -163,7 +163,7 @@ h3 {
 }
 
 .form-label {
-  color: var(--primary-color)
+  color: var(--primary-color);
   display: block;
 }
 

@@ -21,7 +21,7 @@ window.addEventListener('click', (e) => (e.target === modal ? modal.classList.re
 
 // Validate form
 const validate = (nameValue, urlValue) => {
-    const expression = /(https)?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
+    const expression = /(https)?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g
     const regex = new RegExp(expression)
     if (!nameValue || !urlValue) {
         alert('Please submit values for both fields')
@@ -34,6 +34,40 @@ const validate = (nameValue, urlValue) => {
     // Valid
     return true
 }
+
+// Build Bookmarks
+function buildBookmarks() {
+    // Remove all bookmark elements
+    bookmarksContainer.textContent = ''
+    // Build items
+    bookmarks.forEach((bookmark) => {
+      const { name, url } = bookmark
+      // Item
+      const item = document.createElement('div')
+      item.classList.add('item')
+      // Close Icon
+      const closeIcon = document.createElement('i')
+      closeIcon.classList.add('fas', 'fa-times')
+      closeIcon.setAttribute('title', 'Delete Bookmark')
+      closeIcon.setAttribute('onclick', `deleteBookmark('${url}')`)
+      // Favicon / Link Container
+      const linkInfo = document.createElement('div')
+      linkInfo.classList.add('name')
+      // Favicon
+      const favicon = document.createElement('img')
+      favicon.setAttribute('src', `https://s2.googleusercontent.com/s2/favicons?domain=${url}`)
+      favicon.setAttribute('alt', 'Favicon')
+      // Link
+      const link = document.createElement('a')
+      link.setAttribute('href', `${url}`)
+      link.setAttribute('target', '_blank')
+      link.textContent = name
+      // Append to bookmarks container
+      linkInfo.append(favicon, link)
+      item.append(closeIcon, linkInfo)
+      bookmarksContainer.appendChild(item)
+    })
+  }
 
 // Fetch Bookmarks from localStorage
 const fetchBookmarks = () => {
@@ -50,8 +84,20 @@ const fetchBookmarks = () => {
         ]
         localStorage.setItem('bookmarks', JSON.stringify(bookmarks))
     }
+    buildBookmarks()
 }
 
+// Delete Bookmarks
+const deleteBookmark = (url) => {
+    bookmarks.forEach((bookmark, i) => {
+        if (bookmark.url === url) {
+            bookmarks.splice(i, 1)
+        }
+    })
+    // Update bookmarks array in localStorage, repopulate DOM
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks))
+    fetchBookmarks()
+}
 
 // Handle Data from Form
 const storeBookmark = (e) => {
